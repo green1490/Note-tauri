@@ -12,7 +12,7 @@ import { invoke } from '@tauri-apps/api/tauri';
 import { marked } from 'marked'
 import {File,FileContent} from './components/interface/index'
 
-const currentContent = ref<any>()
+const currentMarkdownContent = ref<string>()
 const isInMarkdownMode = ref<boolean>(false)
 const currentNode = ref<TreeNode>()
 const node = ref<TreeNode | undefined>(undefined)
@@ -111,10 +111,10 @@ const replaceEditor = () => {
 
   if (isInMarkdownMode.value) {
     if (currentNode.value?.content) {
-      currentContent.value = marked.parse(currentNode.value.content)
+      currentMarkdownContent.value = marked.parse(currentNode.value.content)
     }
   } else {
-    currentContent.value = currentNode.value?.content
+    currentMarkdownContent.value = currentNode.value?.content
   }
 }
 
@@ -127,6 +127,9 @@ listen<File>('front-read-file', (event)=> {
       currentNode.value.content = event.payload.content.toString()
       currentNode.value.path = event.payload.path.toString()
     }
+    if (isInMarkdownMode.value) {
+      currentMarkdownContent.value = marked.parse(event.payload.content.toString())
+    }
   }
 })
 
@@ -136,6 +139,9 @@ listen<FileContent>('change-file', (event) => {
     currentNode.value = getNode(node.value, event.payload.path)
     if (currentNode.value?.content) {
       currentNode.value.content = event.payload.content
+    }
+    if (isInMarkdownMode.value) {
+      currentMarkdownContent.value = marked.parse(event.payload.content.toString())
     }
   }
 })
@@ -157,7 +163,7 @@ const test = () => {
       <Menu :closed="isFileClosed" @close="test" :mark-down="isInMarkdownMode" @change-mode="replaceEditor" :current-file="(currentNode)? currentNode.fileName() : ''"/>
     </div>
     <div class="editor">
-      <Editor :closed="isFileClosed" @update="updateEditor" :mode="isInMarkdownMode" :file="(currentContent == undefined) ? currentNode?.content : currentContent "/>
+      <Editor :closed="isFileClosed" @update="updateEditor" :mode="isInMarkdownMode" :file="(isInMarkdownMode) ? currentMarkdownContent : currentNode?.content "/>
     </div>
     <div v-show="sidepanelOpened" class="browser" >
       <Filebrowser v-if="node != undefined" :node="node" :root="path"/>
