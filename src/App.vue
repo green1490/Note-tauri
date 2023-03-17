@@ -186,6 +186,7 @@ const test = () => {
 
 .editor{
   grid-area: area;
+  margin-top: 5px;
 }
 
 .dock {

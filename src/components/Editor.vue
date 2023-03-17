@@ -9,7 +9,7 @@
       :value="props.file.toString()"
       />
     </div>
-    <div class="con" v-show="mode === true && !closed" v-html="file" />
+    <div style="color: white; padding-top: 2%;" v-show="mode === true && !closed" v-html="file" />
     <div class="h-100 container-fluid text-center" style="color: white;" v-show="closed">
       <div class="h-100 row align-items-center">
         <div class="col display-1">No file is opened!</div>
@@ -48,6 +48,7 @@
   .textarea {
     width: 100%;
     height: 100%;
+    display: inline;
   }
   
   .textarea {
@@ -56,9 +57,10 @@
   
   .con {
     background-color: #1a1a1c;
+    color: white;
+    padding-top: 2%;
     width: 100%;
     height: 100%;
-    color: white;
   }
   </style>
   
