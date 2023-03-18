@@ -1,6 +1,7 @@
 <template>
     <div
       @click.left="clicked"
+      @click.right="showContextMenu"
       @mouseenter="hover = true"
       @mouseleave="hover = false"
       :style="{ 'margin-left': `${depth * 10}px` }"
@@ -44,7 +45,7 @@ const name = ref<string>()
 const isDir = ref<boolean>()
 
 onMounted(async () => {
-    name.value = await props.node?.fileName()
+    name.value = props.node?.fileName()
     if (props.node) {
       isDir.value = await invoke('is_dir',{path: props.node.path})
     }
@@ -65,12 +66,12 @@ const clicked = async () => {
           if (props.node.content === undefined) {
                 emit('read-file', {
                     path: props.node.path,
-                    fileName: await props.node.fileName()
+                    fileName: props.node.fileName()
                 })
             } else {
                 await invoke('change_file', {
                     path: props.node.path,
-                    fileName:await props.node.fileName(),
+                    fileName:props.node.fileName(),
                     content:props.node.content
                 })
             }
@@ -78,12 +79,25 @@ const clicked = async () => {
     }
 }
 
-const directory = computed < Boolean | undefined >(() => {
-if (props.node?.path === undefined) {
-    return undefined
-} else {
-    return isDir.value
+const showContextMenu = (event:any) => {
+  event.preventDefault()
+  let rect = event.currentTarget.getBoundingClientRect()
+  let x = event.clientX - rect.left
+  let y = event.clientY - rect.top
+
+  invoke('show_context', {
+    contextPath:props.node?.path,
+    offsetx:x,
+    offsety:y
+  })
 }
+
+const directory = computed < Boolean | undefined >(() => {
+  if (props.node?.path === undefined) {
+      return undefined
+  } else {
+      return isDir.value
+  }
 })
 </script>
 

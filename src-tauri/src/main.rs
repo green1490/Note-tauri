@@ -7,9 +7,12 @@ use serde::{Serialize,Deserialize};
 use tauri::{Manager, AppHandle};
 use tauri::State;
 
-//path,//currentFileContent
+//path, currentFileContent, contextPath
 #[derive(Debug,Default)]
-struct Glob(Mutex<String>,Mutex<String>);
+struct Glob(
+    Mutex<String>,
+    Mutex<String>,
+    Mutex<String>);
 
 
 #[derive(Serialize,Deserialize,Debug)]
@@ -29,6 +32,24 @@ struct ReadFileWithContent {
 struct Payload {
     content:String,
     path:String
+}
+
+#[derive(Clone,Serialize)]
+struct ContextData {
+    contextPath:String,
+    offsetx:i32,
+    offsety:i32
+}
+
+#[tauri::command]
+fn show_context(contextPath:String,offsetx:i32, offsety:i32, state: State<Glob>, app:AppHandle) {
+    *state.2.lock().unwrap() = contextPath.clone();
+    app.emit_all("show-context", ContextData {
+        contextPath,
+        offsetx,
+        offsety
+    }).unwrap();
+    
 }
 
 #[tauri::command]
@@ -66,7 +87,8 @@ fn main() {
             is_dir,
             set_path,
             change_file,
-            text_change
+            text_change,
+            show_context
         ])
         .setup(|app| {
             let app_ = app.handle();
@@ -78,9 +100,7 @@ fn main() {
                     content,
                     path:file.path
                 }).unwrap();
-            
             });
-
             Ok(())
         })
         .run(tauri::generate_context!())

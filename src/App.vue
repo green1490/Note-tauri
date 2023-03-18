@@ -5,13 +5,16 @@ import Dock from './components/Dock.vue'
 import Filebrowser from './components/Filebrowser.vue';
 import Editor from './components/Editor.vue'
 import Menu from './components/Menu.vue';
+import ContextMenu from './components/ContextMenu.vue'
 import { readDir } from '@tauri-apps/api/fs'
 import { listen,  } from '@tauri-apps/api/event'
 import { TreeNode } from './components/class/TreeNode';
 import { invoke } from '@tauri-apps/api/tauri';
 import { marked } from 'marked'
-import {File,FileContent} from './components/interface/index'
+import { sep } from '@tauri-apps/api/path'
+import {File,FileContent, ContextData} from './components/interface/index'
 
+const contextPath = ref<string>()
 const currentMarkdownContent = ref<string>()
 const isInMarkdownMode = ref<boolean>(false)
 const currentNode = ref<TreeNode>()
@@ -20,6 +23,9 @@ const currentLayout = ref('"side browser menu"\n"side browser area"\n"dock dock 
 const path = ref<string | undefined>(undefined)
 const sidepanelOpened = ref(true)
 const isFileClosed = ref<boolean>(true)
+const offsetx = ref<number>(0);
+const offsety = ref<number>(0);
+const isContextMenuShown = ref<boolean>(false)
 
 const tree = async (rootPath: string) => {
   const root = new TreeNode(rootPath)
@@ -39,6 +45,35 @@ const tree = async (rootPath: string) => {
     }
   }
   return root
+}
+
+const insertNode = (tree: TreeNode, path: string, nodeName: string) => {
+  if (tree.path === path) {
+    tree.children.push(new TreeNode(`${path}${sep}${nodeName}`))
+  } else {
+    const children = tree.children
+    children.forEach((node) => {
+      insertNode(node, path, nodeName)
+    })
+  }
+}
+
+const removeNode = (tree: TreeNode, path: string) => {
+  const child = tree.children
+  const fileIndex = child.findIndex((node, index): boolean => {
+    if (node.path === path) {
+      return true
+    }
+    return false
+  })
+
+  if (fileIndex !== -1) {
+    child.splice(fileIndex, 1)
+  } else {
+    child.forEach((node) => {
+      removeNode(node, path)
+    })
+  }
 }
 
 const newPath = async (newPathValue?:string) => {
@@ -118,6 +153,35 @@ const replaceEditor = () => {
   }
 }
 
+const hideContextMenu = (event:any) => {
+  event.preventDefault();
+  let rect = event.currentTarget.getBoundingClientRect();
+  let x = event.clientX - rect.left;
+  let y = event.clientY - rect.top;
+  //200 = width   of the context menu
+  //100 = height  of the context menu
+  if ((x < offsetx.value || offsetx.value+200 < x) ||
+    (y < offsety.value || offsety.value+100 < y))
+  isContextMenuShown.value = false
+}
+
+const newNode = (newNode:{path:string,nodeName:string}) => {
+  isContextMenuShown.value = false
+  if (node.value !== undefined) {
+    insertNode(node.value, newNode.path, newNode.nodeName)
+  }
+}
+
+const deleteNode = (deletedNode:{path:string,isCurrentPathExits:boolean}) => {
+  isContextMenuShown.value = false
+  if (node.value) {
+    removeNode(node.value, deletedNode.path)
+    if (!deletedNode.isCurrentPathExits) {
+      currentNode.value = undefined
+      isFileClosed.value = true
+    }
+  }
+}
 
 listen<File>('front-read-file', (event)=> {
   if(node.value) {
@@ -146,13 +210,19 @@ listen<FileContent>('change-file', (event) => {
   }
 })
 
-const test = () => {
-  console.log(node.value)
-}
+listen<ContextData>('show-context', (event) => {
+  isContextMenuShown.value = true
+  offsetx.value = event.payload.offsetx
+  offsety.value = event.payload.offsety
+  contextPath.value = event.payload.contextPath
+})
 </script>
 
 <template>
-  <div class="cont">
+  <!-- Ezt átírni firebrowserre
+  és ctrl+s-ni lehessen a fájlokat -->
+  <div class="cont"
+    @click.left="hideContextMenu">
     <div class="sidebar">
         <Sidebar @toggle="change" @path-selected="newPath"/>
     </div>
@@ -160,7 +230,7 @@ const test = () => {
       <Dock/>
     </div>
     <div class="menu">
-      <Menu :closed="isFileClosed" @close="test" :mark-down="isInMarkdownMode" @change-mode="replaceEditor" :current-file="(currentNode)? currentNode.fileName() : ''"/>
+      <Menu :closed="isFileClosed" @close="closeFile" :mark-down="isInMarkdownMode" @change-mode="replaceEditor" :current-file="(currentNode)? currentNode.fileName() : ''"/>
     </div>
     <div class="editor">
       <Editor :closed="isFileClosed" @update="updateEditor" :mode="isInMarkdownMode" :file="(isInMarkdownMode) ? currentMarkdownContent : currentNode?.content "/>
@@ -168,10 +238,23 @@ const test = () => {
     <div v-show="sidepanelOpened" class="browser" >
       <Filebrowser v-if="node != undefined" :node="node" :root="path"/>
     </div>
+    <div class="context" :style="{
+      'top':offsety+'px',
+      'left':offsetx+'px'}"
+      v-show="isContextMenuShown"
+      >
+      <ContextMenu @delete-node="deleteNode" :root-path="node?.path" @new-node="newNode" :context-path="contextPath"/>
+    </div>
   </div>
 </template>
 
 <style>
+.context {
+  position: absolute;
+  width: 200px;
+  height: 100px;
+}
+
 .cont {
   grid-template-areas: v-bind('currentLayout');
 }

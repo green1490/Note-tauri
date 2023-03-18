@@ -14,10 +14,16 @@
     "allowlist": {
       "fs": {
         "readDir": true,
+        "exists": true,
+        "removeDir": true,
+        "removeFile": true,
+        "writeFile": true,
+        "createDir": true,
         "scope": ["**"]
       },
       "dialog": {
-        "open": true
+        "open": true,
+        "save": true
       },
       "shell": {
         "all": false,
@@ -36,7 +42,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.tauri.Note-tauri",
       "targets": "all"
     },
     "security": {
@@ -50,8 +56,8 @@
         "fullscreen": false,
         "resizable": true,
         "title": "Note-tauri",
-        "width": 800,
-        "height": 600
+        "minWidth": 800,
+        "minHeight": 600
       }
     ]
   }
