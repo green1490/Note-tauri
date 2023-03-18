@@ -21,6 +21,9 @@
         "createDir": true,
         "scope": ["**"]
       },
+      "globalShortcut": {
+        "all": true
+      },
       "dialog": {
         "open": true,
         "save": true

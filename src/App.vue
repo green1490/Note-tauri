@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Sidebar from './components/Sidebar.vue'
 import Dock from './components/Dock.vue'
 import Filebrowser from './components/Filebrowser.vue';
@@ -12,6 +12,7 @@ import { TreeNode } from './components/class/TreeNode';
 import { invoke } from '@tauri-apps/api/tauri';
 import { marked } from 'marked'
 import { sep } from '@tauri-apps/api/path'
+import { register } from '@tauri-apps/api/globalShortcut'
 import {File,FileContent, ContextData} from './components/interface/index'
 
 const contextPath = ref<string>()
@@ -138,6 +139,7 @@ const updateEditor = (text:string) => {
 
 const closeFile = () => {
   isFileClosed.value = true
+  currentNode.value = undefined
 }
 
 
@@ -182,6 +184,16 @@ const deleteNode = (deletedNode:{path:string,isCurrentPathExits:boolean}) => {
     }
   }
 }
+
+onMounted(async () => {
+  await register('CommandOrControl+S', () => {
+    if (currentNode.value?.content)
+    invoke('save_to_file', {
+      path:currentNode.value.path,
+      content:currentNode.value.content
+    })
+  });
+})
 
 listen<File>('front-read-file', (event)=> {
   if(node.value) {

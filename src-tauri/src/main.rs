@@ -2,7 +2,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::{fs::metadata, sync::{Mutex},fs::read_to_string};
+use std::{fs::{metadata,write}, sync::{Mutex},fs::read_to_string};
 use serde::{Serialize,Deserialize};
 use tauri::{Manager, AppHandle};
 use tauri::State;
@@ -39,6 +39,11 @@ struct ContextData {
     contextPath:String,
     offsetx:i32,
     offsety:i32
+}
+
+#[tauri::command]
+fn save_to_file(path:String,content:String) {
+    write(path,content).unwrap();
 }
 
 #[tauri::command]
@@ -88,7 +93,8 @@ fn main() {
             set_path,
             change_file,
             text_change,
-            show_context
+            show_context,
+            save_to_file
         ])
         .setup(|app| {
             let app_ = app.handle();
