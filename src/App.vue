@@ -231,8 +231,6 @@ listen<ContextData>('show-context', (event) => {
 </script>
 
 <template>
-  <!-- Ezt átírni firebrowserre
-  és ctrl+s-ni lehessen a fájlokat -->
   <div class="cont"
     @click.left="hideContextMenu">
     <div class="sidebar">

@@ -51,10 +51,6 @@ onMounted(async () => {
     }
 })
 
-//   const contextMenu = () => {
-//     ipcRenderer.send('context-menu', props.node?.path, props.root)
-//   }
-
 const clicked = async () => {
     expanded.value = !expanded.value
     if (props.node?.path) {

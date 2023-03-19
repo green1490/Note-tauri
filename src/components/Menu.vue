@@ -10,7 +10,6 @@ const changeMode = () => {
 }
 const emit = defineEmits(['change-mode', 'close'])
 
-
 </script>
 
 <template>

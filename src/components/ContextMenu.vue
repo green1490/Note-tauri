@@ -39,7 +39,6 @@ const newFolder = async () => {
 
 const newFile = async () => {
     if (prop.contextPath) {
-        console.log(prop.contextPath)
         let isDir:boolean = await invoke('is_dir', {
             path:prop.contextPath
         })
@@ -58,7 +57,6 @@ const newFile = async () => {
                             nodeName:name
                         })
                     }
-                    console.log(`${await basename(userFileName)}`)
                 } catch (err) {
                     userFileName = userFileName + '.md'
                     writeTextFile(userFileName,'')
