@@ -19,6 +19,7 @@
         "removeFile": true,
         "writeFile": true,
         "createDir": true,
+        "readFile": true,
         "scope": ["**"]
       },
       "globalShortcut": {

@@ -14,6 +14,11 @@ import { marked } from 'marked'
 import { sep } from '@tauri-apps/api/path'
 import { register } from '@tauri-apps/api/globalShortcut'
 import {File,FileContent, ContextData} from './components/interface/index'
+import {PockatController} from './components/lib/pocketbase'
+import PocketBase from 'pocketbase'
+
+const pbc = new PockatController(new PocketBase(import.meta.env.VITE_IP))
+pbc.sync()
 
 const contextPath = ref<string>()
 const currentMarkdownContent = ref<string>()
@@ -183,6 +188,10 @@ const deleteNode = (deletedNode:{path:string,isCurrentPathExits:boolean}) => {
       isFileClosed.value = true
     }
   }
+}
+
+const syncPath = () => {
+  console.log('sync')
 }
 
 onMounted(async () => {

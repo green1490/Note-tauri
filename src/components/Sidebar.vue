@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { open } from '@tauri-apps/api/dialog'
+import { writeTextFile,readTextFile } from '@tauri-apps/api/fs';
+import { BaseDirectory, configDir } from '@tauri-apps/api/path';
 
 const emit = defineEmits(['path-selected', 'toggle', 'sync-path'])
 
@@ -14,8 +16,15 @@ const collapse = () => {
   emit('toggle')
 }
 
-const sync = () => {
-  emit('sync-path')
+const sync = async () => {
+  const userPath = await open({
+    directory: true,
+    multiple: false
+  })
+
+  if(userPath && typeof userPath == 'string') {
+    await writeTextFile({ path: 'app.conf', contents: userPath }, { dir: BaseDirectory.Config });
+  }
 }
 </script>
 
