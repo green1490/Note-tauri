@@ -3,7 +3,7 @@ import { basename,join, sep } from '@tauri-apps/api/path'
 import { invoke } from '@tauri-apps/api/tauri'
 import PocketBase,{Record} from 'pocketbase'
 import { dirReader } from '../class/dirReader'
-import { B } from '@tauri-apps/api/fs-4bb77382'
+
 
 export class PockatController {
     private pb:PocketBase

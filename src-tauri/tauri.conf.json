@@ -13,6 +13,7 @@
   "tauri": {
     "allowlist": {
       "fs": {
+        "all":true,
         "readDir": true,
         "exists": true,
         "removeDir": true,
@@ -20,7 +21,13 @@
         "writeFile": true,
         "createDir": true,
         "readFile": true,
-        "scope": ["**"]
+        "scope": [
+          "$APPCONFIG/*/**",
+          "$APPDATA/*/**",
+          "$CONFIG/*/**",
+          "$DESKTOP/*/**",
+          "*/**"
+        ]
       },
       "globalShortcut": {
         "all": true

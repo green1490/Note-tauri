@@ -30,6 +30,7 @@ import { TreeNode } from './class/TreeNode'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { invoke } from '@tauri-apps/api/tauri'
 import { emit } from '@tauri-apps/api/event'
+import { theme } from '../theme'
 
 const props = defineProps({
 node: TreeNode,
@@ -96,17 +97,16 @@ const directory = computed < Boolean | undefined >(() => {
   }
 })
 </script>
+<style scoped>
+.node {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
 
-  <style scoped>
-  .node {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-  
-  .node-hover {
-    cursor: pointer;
-    background-color: #3d3b3b;
-  }
-  </style>
+.node-hover {
+  cursor: v-bind('theme.fileBrowser.hover.cursor');
+  background-color: v-bind('theme.fileBrowser.hover.backgroundColor');
+}
+</style>
   

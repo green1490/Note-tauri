@@ -11,20 +11,14 @@ const fileBrowser = async () => {
     directory:true
   })
   emit('path-selected', path)
+
+  if(path && typeof path == 'string') {
+    await writeTextFile({ path: 'app.conf', contents: path }, { dir: BaseDirectory.Config });
+  }
+
 }
 const collapse = () => {
   emit('toggle')
-}
-
-const sync = async () => {
-  const userPath = await open({
-    directory: true,
-    multiple: false
-  })
-
-  if(userPath && typeof userPath == 'string') {
-    await writeTextFile({ path: 'app.conf', contents: userPath }, { dir: BaseDirectory.Config });
-  }
 }
 </script>
 
@@ -41,18 +35,18 @@ const sync = async () => {
           class="fa fa-lg"
           icon="fa-solid fa-folder"/>
       </button>
-      <button @click="sync" class="btn btn-outline-dark">
+      <!-- <button @click="sync" class="btn btn-outline-dark">
         <font-awesome-icon
           class="fa fa-lg"
           icon="fa-solid fa-sync" />
-      </button>
+      </button> -->
     </div>
     <div>
-      <button class="btn btn-outline-dark">
+      <!-- <button class="btn btn-outline-dark">
         <font-awesome-icon
           class="fa fa-lg"
           icon="fa-solid fa-gear" />
-      </button>
+      </button> -->
     </div>
   </div>
 </template>

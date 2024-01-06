@@ -18,7 +18,8 @@
   </template>
   
   <script setup lang="ts">
-  
+  import { theme } from '../theme'
+
   const props = defineProps<{
     file?: string | undefined,
     mode?: boolean
@@ -34,33 +35,29 @@
   }
   
   </script>
-  <style scoped>
-  .textarea {
-    border: none;
-    overflow: auto;
-    outline: none;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    resize: none;
-  }
-  
-  .textarea {
-    width: 100%;
-    height: 100%;
-    display: inline;
-  }
-  
-  .textarea {
-    background-color: #1a1a1c;
-  }
-  
-  .con {
-    background-color: #1a1a1c;
-    color: white;
-    padding-top: 2%;
-    width: 100%;
-    height: 100%;
-  }
-  </style>
-  
+<style scoped>
+.textarea {
+  border: none;
+  overflow: auto;
+  outline: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  resize: none;
+}
+
+.textarea {
+  width: 100%;
+  height: 100%;
+}
+
+.textarea {
+  background-color: v-bind('theme.editor.backgroundColor');
+}
+
+.con {
+  width: 100%;
+  height: 100%;
+  color: v-bind('theme.editor.fontColor');
+}
+</style>

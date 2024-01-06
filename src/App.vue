@@ -17,7 +17,7 @@ import {File,FileContent, ContextData} from './components/interface/index'
 import {PockatController} from './components/lib/pocketbase'
 import PocketBase from 'pocketbase'
 
-const pbc = new PockatController(new PocketBase(import.meta.env.VITE_IP))
+const pbc = new PockatController(new PocketBase('http://127.0.0.1:8090'))
 pbc.sync()
 
 const contextPath = ref<string>()
@@ -246,7 +246,7 @@ listen<ContextData>('show-context', (event) => {
         <Sidebar @toggle="change" @path-selected="newPath"/>
     </div>
     <div class="dock">
-      <Dock/>
+      <Dock :text="currentNode?.content"/>
     </div>
     <div class="menu">
       <Menu :closed="isFileClosed" @close="closeFile" :mark-down="isInMarkdownMode" @change-mode="replaceEditor" :current-file="(currentNode)? currentNode.fileName() : ''"/>
